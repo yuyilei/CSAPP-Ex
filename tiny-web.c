@@ -22,7 +22,7 @@ int main(int argc , char **argv ) {
     while (1) {
         clientlen = sizeof(clientaddr) ;
         connfd = Accept(listenfd, (SA *)&clientaddr , & clientlen ) ;
-        Getnameinfo((SA*) &clientaddr , &clientlen , hostname , MAXLINE , port , MAXLINE , 0 ) ;
+        Getnameinfo((SA*) &clientaddr , clientlen , hostname , MAXLINE , port , MAXLINE , 0 ) ;
         printf("Accpet connection from (%s ,%s)\n",hostname,port) ;
         doit(connfd) ;
         Close(connfd) ;
@@ -67,8 +67,8 @@ void doit(int fd ) {
             clienterror(fd,filename,"403","Forbidden","Tiny cound not  run the CGI program") ;
             return ;
        }
-        serve_dynamic(fd,filename,sbuf.st_mode) ;
-    }
+        serve_dynamic(fd,filename,cgiargs) ;
+	}
 }
 
 // 发送http相应到客户端
@@ -132,7 +132,7 @@ void serve_static(int fd, char *filename , int filesize) {
 // send response headers to client
     get_filetype(filename,filetype) ;
     sprintf(buf,"HTTP/1.0 200 OK\r\n") ;
-    sprintf(buf,"%sServer: Tiny Web Server\r\n") ;
+    sprintf(buf,"%sServer: Tiny Web Server\r\n",buf) ;
     sprintf(buf,"%sConnection: close \r\n",buf) ;
     sprintf(buf,"%sContent-length: %d\r\n",buf,filesize) ;
     sprintf(buf,"%sConten-type: %s\r\n",buf,filetype) ;

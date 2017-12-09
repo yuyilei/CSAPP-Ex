@@ -99,7 +99,6 @@ void doit(int fd) {
     Rio_readlineb(&rio,buf,MAXLINE ) ;
     sscanf(buf,"%s %s %s",method,uri,version) ;
     if ( find_and_insert_cache(buf, proxy_buf,&num) != 0 ){
-        printf("** get from the cache\n") ; 
         Rio_writen(fd,proxy_buf,num) ;   
         return ;  
     }  
@@ -110,10 +109,8 @@ void doit(int fd) {
     parse_url(uri,hostname,filename,port) ; 
     rio_t proxy_rio ; 
     int proxy_fd = open_clientfd(hostname,port) ; 
-    printf("!!!fd:%d\n",proxy_fd) ; 
     if ( proxy_fd < 0 ){
         Close(proxy_fd) ;  
-        printf("  uri:%s   hostname:%s    port:%s\n\n",uri,hostname,port) ; 
         unix_error("Can not connect to the final server!\n") ; 
     }
     connect_server(proxy_fd,hostname,port,filename,&rio) ; 
@@ -126,7 +123,6 @@ void doit(int fd) {
         all_num += num ; 
     } 
     
-    printf("all_buf: %s\n\n",all_buf) ; 
     if ( all_num <= MAX_OBJECT_SIZE ) 
         save_to_cache(buf, all_buf, all_num) ;    
     Close(proxy_fd) ; 
@@ -260,7 +256,6 @@ int find_and_insert_cache(char *request, char *response, size_t * size){
     while ( tmp != NULL ){
         if  ( strcmp(request,tmp->request) == 0 )
             break ; 
-        printf("\n\n tmp request:%s \n",tmp->request+1) ;
         tmp = tmp->next ; 
     }
     if ( tmp == NULL ){
